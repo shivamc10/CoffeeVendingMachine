@@ -10,7 +10,6 @@ public class Ingredient {
 
     synchronized public void getRefill(int amnt){
          this.amount += amnt;
-
      }
 
     synchronized public boolean reduceAmount(int amnt){

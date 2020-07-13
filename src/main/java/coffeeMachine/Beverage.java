@@ -12,7 +12,7 @@ public class Beverage{
         this.ingredientObjects = ingredients;
     }
 
-    public boolean readyBeverage() {
+    public String readyBeverage() throws InterruptedException {
         Printer.notify("preparing "+this.name);
         try{
             List<String> used = new ArrayList<>();
@@ -20,11 +20,15 @@ public class Beverage{
                 String ingredient = entry.getKey();
                 if(!ingredientObjects.containsKey(ingredient) ||
                         !ingredientObjects.get(ingredient).checkAmount(entry.getValue().intValue())){
-                    if(!ingredientObjects.containsKey(ingredient))
-                        Printer.print(this.name, ingredient, -1);
-                    else
-                        Printer.print(this.name, ingredient, 0);
-                    return false;
+                    if(!ingredientObjects.containsKey(ingredient)){
+//                        Printer.print(this.name, ingredient, -1);
+                        return this.name+" cannot be prepared because "+ ingredient +" is not available";
+                    }
+                    else{
+//                        Printer.print(this.name, ingredient, 0);
+                        return this.name+" cannot be prepared because "+ ingredient +" is not sufficient";
+                    }
+
                 }
                 used.add(ingredient);
             }
@@ -37,7 +41,9 @@ public class Beverage{
             Printer.notify(this.name+" is failed");
             e.printStackTrace();
         }
-        return  true;
+        Thread.sleep(5000);
+//        Printer.print(this.name,null,0);
+        return this.name + " is prepared";
     }
 
 }

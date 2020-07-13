@@ -6,20 +6,43 @@ import org.json.simple.parser.ParseException;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.stream.Collectors;
 
-public class runner {
-    static Map<String, Beverage> beverageObjects = new HashMap<>();
-    static Map<String, Ingredient> ingredientObjects = new HashMap<>();
-    static int outletCount;
+public class Runner {
+    Map<String, Beverage> beverageObjects = new HashMap<>();
+    Map<String, Ingredient> ingredientObjects = new HashMap<>();
+    int outletCount;
+    String fileName;
+    public Runner(String fileName) {
+        this.fileName = fileName;
+    }
+    public List<String> start(){
+        BlockingQueue<String> orders = initialize(fileName);
+        Outlet[] outlets = new Outlet[outletCount];
+        Thread[] threads = new Thread[outletCount];
+        CountDownLatch latch = new CountDownLatch(outletCount);
+        for (int i = 0; i < outletCount; i++) {
+            outlets[i] = new Outlet(i + 1, beverageObjects, orders, latch, ingredientObjects);
+            threads[i] = new Thread(outlets[i]);
+            threads[i].start();
+        }
+        try{
+            latch.await();
+            return Arrays.stream(outlets).flatMap(c -> c.results.stream()).collect(Collectors.toList());
+        }
+        catch(InterruptedException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
     @SuppressWarnings("unchecked")
-    public static BlockingQueue<String> initialize(String fileName)
+    public BlockingQueue<String> initialize(String fileName)
     {
-        BlockingQueue<String> orders = new LinkedBlockingDeque<>();
+        List<String> orderList = new ArrayList<>();
         JSONParser jsonParser = new JSONParser();
         try{
             FileReader reader = new FileReader(fileName);
@@ -36,39 +59,28 @@ public class runner {
             }
             System.out.println();
             Map beverages = (Map)machine.get("beverages");
+//            System.out.println(beverages);
             for (Map.Entry pair : (Iterable<Map.Entry>) beverages.entrySet()) {
                 String name = (String) pair.getKey();
                 Map<String, Long> ingredientList = (Map<String, Long>) pair.getValue();
-                orders.add(name);
+                orderList.add(name);
 //                System.out.println(name+ " "+ ingredientList);
                 beverageObjects.put(name, new Beverage(name, ingredientList, ingredientObjects));
             }
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
-
+        Collections.shuffle(orderList);
+        BlockingQueue<String> orders = new LinkedBlockingDeque<>(orderList);
         return orders;
     }
 
     public static void main(String[] args){
-        String fileName = "C:\\Users\\ShivamChoubey\\Desktop\\Personal\\Assignment\\Dunzo\\CoffeeVendingMachine\\src\\input.json";
-        BlockingQueue<String> orders = initialize(fileName);
-        Outlet[] outlets = new Outlet[outletCount];
-        Thread[] threads = new Thread[outletCount];
-        CountDownLatch latch = new CountDownLatch(outletCount);
-        for(int i=0;i<outletCount;i++){
-            outlets[i] = new Outlet(i+1, beverageObjects, orders, latch);
-            threads[i] = new Thread(outlets[i]);
-            threads[i].start();
-        }
-
-        try{
-            latch.await();
-            System.out.println("order completed");
-        }
-        catch(InterruptedException e) {
-            e.printStackTrace();
-        }
-
+        String fileName = "src/main/resources/input.json";
+        Runner runner = new Runner(fileName);
+        List<String> result = runner.start();
+        Collections.sort(result);
+        for(String res:result)
+            System.out.println(res);
     }
 }
