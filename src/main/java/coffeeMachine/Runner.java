@@ -80,6 +80,8 @@ public class Runner {
         // in case of any failure it will re initialize the data stored in file and remove the completed order and restart
         // real life situation will be power cut or something component stopped working causing failure
         if (f.exists()){
+            f.delete();             //delete the file so that next start will not consider it as a restart
+            f = new File("src/main/resources/remaining.json");
             FileReader reader = new FileReader("src/main/resources/remaining.json");
             JSONObject remaining = (JSONObject) jsonParser.parse(reader);
             ingredientObjects = new HashMap<>();
@@ -89,6 +91,7 @@ public class Runner {
                 int amnt = ((Long) pair.getValue()).intValue();
                 ingredientObjects.put(name, new Ingredient(name, amnt));
             }
+            f.delete();
             File file=new File("src/main/resources/order.log");
             FileReader fr=new FileReader(file);
             BufferedReader br=new BufferedReader(fr);
@@ -96,6 +99,7 @@ public class Runner {
             while((item=br.readLine())!=null){
                 orderList.remove(item);
             }
+            file.delete();
         }
         Collections.shuffle(orderList);
         BlockingQueue<String> orders = new LinkedBlockingDeque<>(orderList);
