@@ -5,13 +5,14 @@ import org.junit.Test;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class MachineUnitTest {
     Beverage beverageTest;
     Ingredient ingredientTest;
     Runner runnerTest;
+
+    // unit test for Beverage class readyBeverage() method is tested
     @Test
     public void testBeverage() throws InterruptedException {
         String name = "hot_tea";
@@ -36,26 +37,33 @@ public class MachineUnitTest {
 
         assertEquals(result, expected);
     }
+
+    // unit test for Ingredient class
     @Test
     public void testIngredient() throws InterruptedException {
         String name = "sugar_syrup";
         int amnt = 500;
         ingredientTest = new Ingredient(name, amnt);
 
+        // testing checkAmount() method
         boolean result = ingredientTest.checkAmount(100);
         assertTrue(result);
 
-        result = ingredientTest.reduceAmount(100);
-        assertTrue(result);
+        // testing reduceAmount() method
+        ingredientTest.reduceAmount(100);
+        result = ingredientTest.checkAmount(500);
+        assertFalse(result);
 
-        ingredientTest.getRefill(100);
+        // testing refill() method
+        ingredientTest.refill(100);
         result = ingredientTest.checkAmount(500);
         assertTrue(result);
 
     }
 
+    // Unit test for initialize method for runner
     @Test
-    public void testRunnerInitialize() throws InterruptedException {
+    public void testRunnerInitialize(){
         String fileName = "src/main/resources/input.json";
         runnerTest = new Runner(fileName);
         Queue<String> result = runnerTest.initialize(fileName);

@@ -13,6 +13,9 @@ import static org.junit.Assert.assertThat;
 
 public class CoffeeMachineFunctionalTest {
     Runner runnerTest;
+    // end to end testing for various test cases of coffee machine
+
+    // given input in which one item is missing from ingredient list
     @Test
     public void testMachine() {
         String fileName = "src/main/resources/input.json";
@@ -40,6 +43,7 @@ public class CoffeeMachineFunctionalTest {
 
     }
 
+    // test case in which all the ingredients are 0
     @Test
     public void testAllZeroes(){
         String fileName = "src/main/resources/AllZeroes.json";
@@ -53,7 +57,7 @@ public class CoffeeMachineFunctionalTest {
         result.add("hot_tea cannot be prepared because hot_milk is not sufficient");
         assertEquals(result, expected);
     }
-
+    //test case in which all ingredients are sufficient to make all bevrages
     @Test
     public void testAllAvalaible(){
         String fileName = "src/main/resources/allAvailable.json";

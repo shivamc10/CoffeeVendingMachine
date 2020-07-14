@@ -3,6 +3,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class Outlet implements Runnable{
+    // outlet class are threads running in parallel to complete the order listed in blockingQueue
     int id;
     Map<String, Beverage> beverages;
     BlockingQueue<String> orderList;
@@ -18,7 +19,7 @@ public class Outlet implements Runnable{
         results = new ArrayList<>();
         this.ingredientObjects = ingObjects;
     }
-
+    // run method to remove orders from queue and prepare them in parallel between threads
     @Override
     public void run(){
         try {

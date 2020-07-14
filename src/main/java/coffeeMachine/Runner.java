@@ -20,7 +20,10 @@ public class Runner {
     public Runner(String fileName) {
         this.fileName = fileName;
     }
+
+    // start the machine by initializing the ingredients and orders
     public List<String> start(){
+
         BlockingQueue<String> orders = initialize(fileName);
         Outlet[] outlets = new Outlet[outletCount];
         Thread[] threads = new Thread[outletCount];
@@ -39,9 +42,12 @@ public class Runner {
             return Collections.emptyList();
         }
     }
+
+    // initialize the parameters from reading json file and queue the orders in blockingqueue to work in parallel
     @SuppressWarnings("unchecked")
     public BlockingQueue<String> initialize(String fileName)
     {
+
         List<String> orderList = new ArrayList<>();
         JSONParser jsonParser = new JSONParser();
         try{
@@ -75,6 +81,7 @@ public class Runner {
         return orders;
     }
 
+    // main function to call the coffee machine
     public static void main(String[] args){
         String fileName = "src/main/resources/input.json";
         Runner runner = new Runner(fileName);
