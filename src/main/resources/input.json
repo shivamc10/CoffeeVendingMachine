@@ -9,6 +9,7 @@
       "ginger_syrup": 100,
       "sugar_syrup": 100,
       "tea_leaves_syrup": 100
+
     },
     "beverages": {
       "hot_tea": {
@@ -36,6 +37,7 @@
         "ginger_syrup": 30,
         "sugar_syrup": 50,
         "green_mixture": 30
+
       }
     }
   }

@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.core.AnyOf.anyOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-
 
 public class CoffeeMachineFunctionalTest {
     Runner runnerTest;
@@ -19,6 +19,7 @@ public class CoffeeMachineFunctionalTest {
         runnerTest = new Runner(fileName);
         List<String> expected = runnerTest.start();
         Collections.sort(expected);
+
         List<String> result1 = new ArrayList<>();
         result1.add("black_tea is prepared");
         result1.add("green_tea cannot be prepared because green_mixture is not available");

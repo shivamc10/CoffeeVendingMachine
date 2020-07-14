@@ -16,6 +16,7 @@ public class Outlet implements Runnable{
         this.orderList = orders;
         this.latch = latch;
         results = new ArrayList<>();
+
         this.ingredientObjects = ingObjects;
     }
 
@@ -25,10 +26,12 @@ public class Outlet implements Runnable{
             String order = this.orderList.poll(100, TimeUnit.MILLISECONDS);
             while (order!=null){
                 Printer.notify("starting "+order);
+
                 if(beverages.containsKey(order))
                     results.add(beverages.get(order).readyBeverage());
                 else
                     Printer.notify(order + "is not a correct beverage");
+
                 order = orderList.poll(100, TimeUnit.MILLISECONDS);
             }
         } catch (InterruptedException e) {
