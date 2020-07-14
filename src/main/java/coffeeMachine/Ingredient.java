@@ -3,6 +3,15 @@ package coffeeMachine;
 public class Ingredient {
     // Ingredient class for the ingredients with name and amount
     private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
     private int amount;
      public Ingredient(String nme, int amnt){
          this.name = nme;

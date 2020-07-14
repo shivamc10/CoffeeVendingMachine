@@ -4,8 +4,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -22,14 +21,14 @@ public class Runner {
     }
 
     // start the machine by initializing the ingredients and orders
-    public List<String> start(){
-
+    public List<String> start() throws IOException, ParseException {
+        Store store = new Store();
         BlockingQueue<String> orders = initialize(fileName);
         Outlet[] outlets = new Outlet[outletCount];
         Thread[] threads = new Thread[outletCount];
         CountDownLatch latch = new CountDownLatch(outletCount);
         for (int i = 0; i < outletCount; i++) {
-            outlets[i] = new Outlet(i + 1, beverageObjects, orders, latch, ingredientObjects);
+            outlets[i] = new Outlet(i + 1, beverageObjects, orders, latch, ingredientObjects, store);
             threads[i] = new Thread(outlets[i]);
             threads[i].start();
         }
@@ -38,16 +37,16 @@ public class Runner {
             return Arrays.stream(outlets).flatMap(c -> c.results.stream()).collect(Collectors.toList());
         }
         catch(InterruptedException e) {
-            e.printStackTrace();
+            PrintWriter pw = new PrintWriter(new File("src/main/resources/error.log"));
+            e.printStackTrace(pw);
+            store.storeState(ingredientObjects);
             return Collections.emptyList();
         }
     }
 
     // initialize the parameters from reading json file and queue the orders in blockingqueue to work in parallel
     @SuppressWarnings("unchecked")
-    public BlockingQueue<String> initialize(String fileName)
-    {
-
+    public BlockingQueue<String> initialize(String fileName) throws IOException, ParseException {
         List<String> orderList = new ArrayList<>();
         JSONParser jsonParser = new JSONParser();
         try{
@@ -76,13 +75,35 @@ public class Runner {
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
+
+        File f = new File("src/main/resources/error.log");
+        // in case of any failure it will re initialize the data stored in file and remove the completed order and restart
+        // real life situation will be power cut or something component stopped working causing failure
+        if (f.exists()){
+            FileReader reader = new FileReader("src/main/resources/remaining.json");
+            JSONObject remaining = (JSONObject) jsonParser.parse(reader);
+            ingredientObjects = new HashMap<>();
+            Map remIngredients = (Map) remaining.get("total_items_quantity");
+            for (Map.Entry pair : (Iterable<Map.Entry>) remIngredients.entrySet()) {
+                String name = (String) pair.getKey();
+                int amnt = ((Long) pair.getValue()).intValue();
+                ingredientObjects.put(name, new Ingredient(name, amnt));
+            }
+            File file=new File("src/main/resources/order.log");
+            FileReader fr=new FileReader(file);
+            BufferedReader br=new BufferedReader(fr);
+            String item;
+            while((item=br.readLine())!=null){
+                orderList.remove(item);
+            }
+        }
         Collections.shuffle(orderList);
         BlockingQueue<String> orders = new LinkedBlockingDeque<>(orderList);
         return orders;
     }
 
     // main function to call the coffee machine
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException, ParseException {
         String fileName = "src/main/resources/input.json";
         Runner runner = new Runner(fileName);
         List<String> result = runner.start();

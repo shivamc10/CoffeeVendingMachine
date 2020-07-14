@@ -1,8 +1,10 @@
 import coffeeMachine.Beverage;
 import coffeeMachine.Ingredient;
 import coffeeMachine.Runner;
+import org.json.simple.parser.ParseException;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -63,7 +65,7 @@ public class MachineUnitTest {
 
     // Unit test for initialize method for runner
     @Test
-    public void testRunnerInitialize(){
+    public void testRunnerInitialize() throws IOException, ParseException {
         String fileName = "src/main/resources/input.json";
         runnerTest = new Runner(fileName);
         Queue<String> result = runnerTest.initialize(fileName);
