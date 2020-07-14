@@ -26,7 +26,9 @@ public class Runner {
         Thread[] threads = new Thread[outletCount];
         CountDownLatch latch = new CountDownLatch(outletCount);
         for (int i = 0; i < outletCount; i++) {
-            outlets[i] = new Outlet(i + 1, beverageObjects, orders, latch);
+
+            outlets[i] = new Outlet(i + 1, beverageObjects, orders, latch, ingredientObjects);
+
             threads[i] = new Thread(outlets[i]);
             threads[i].start();
         }
@@ -42,7 +44,8 @@ public class Runner {
     @SuppressWarnings("unchecked")
     public BlockingQueue<String> initialize(String fileName)
     {
-        BlockingQueue<String> orders = new LinkedBlockingDeque<>();
+        List<String> orderList = new ArrayList<>();
+
         JSONParser jsonParser = new JSONParser();
         try{
             FileReader reader = new FileReader(fileName);
@@ -59,22 +62,28 @@ public class Runner {
             }
             System.out.println();
             Map beverages = (Map)machine.get("beverages");
+//            System.out.println(beverages);
             for (Map.Entry pair : (Iterable<Map.Entry>) beverages.entrySet()) {
                 String name = (String) pair.getKey();
                 Map<String, Long> ingredientList = (Map<String, Long>) pair.getValue();
-                orders.add(name);
+                orderList.add(name);
+
 //                System.out.println(name+ " "+ ingredientList);
                 beverageObjects.put(name, new Beverage(name, ingredientList, ingredientObjects));
             }
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
-//        System.out.println(orders);
+
+        Collections.shuffle(orderList);
+        BlockingQueue<String> orders = new LinkedBlockingDeque<>(orderList);
+
         return orders;
     }
 
     public static void main(String[] args){
-        String fileName = "src/main/resources/allAvailable.json";
+
+        String fileName = "src/main/resources/input.json";
         Runner runner = new Runner(fileName);
         List<String> result = runner.start();
         Collections.sort(result);
