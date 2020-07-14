@@ -48,6 +48,7 @@ public class Runner {
     @SuppressWarnings("unchecked")
     public BlockingQueue<String> initialize(String fileName) throws IOException, ParseException {
         List<String> orderList = new ArrayList<>();
+
         JSONParser jsonParser = new JSONParser();
         try{
             FileReader reader = new FileReader(fileName);
@@ -69,6 +70,7 @@ public class Runner {
                 String name = (String) pair.getKey();
                 Map<String, Long> ingredientList = (Map<String, Long>) pair.getValue();
                 orderList.add(name);
+
 //                System.out.println(name+ " "+ ingredientList);
                 beverageObjects.put(name, new Beverage(name, ingredientList, ingredientObjects));
             }
@@ -99,6 +101,7 @@ public class Runner {
         }
         Collections.shuffle(orderList);
         BlockingQueue<String> orders = new LinkedBlockingDeque<>(orderList);
+
         return orders;
     }
 
