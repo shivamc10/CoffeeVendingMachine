@@ -68,12 +68,14 @@ public class MachineUnitTest {
     public void testRunnerInitialize() throws IOException, ParseException {
         String fileName = "src/main/resources/input.json";
         runnerTest = new Runner(fileName);
-        Queue<String> result = runnerTest.initialize(fileName);
-        Queue<String> expected = new LinkedList<>();
+        List<String> result = new ArrayList<>(runnerTest.initialize(fileName));
+        Collections.sort(result);
+        List<String> expected = new ArrayList<>();
         expected.add("hot_tea");
         expected.add("hot_coffee");
         expected.add("green_tea");
         expected.add("black_tea");
+        Collections.sort(expected);
         assertEquals(result,expected);
     }
 }
